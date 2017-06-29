@@ -1,0 +1,132 @@
+<html>
+<head>
+  <title>Star Rating</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <style>
+    body {
+      font-family: Verdana;
+    }
+    h1, h2, h3 {
+      color: #AE50ACFF;
+    }
+    .rating-circle {
+      display: inline-block;
+    }
+    .glyphicon-star {
+      color: white;
+      font-size: 50px;
+      text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; /* simulation for making glyphicon border*/
+    }
+    .rating-hover {
+      color: yellow;
+    }
+    .rating-chosen {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Star Rating System</h1>
+  <h2>Finding elements using jQuery and Bootstrap Glyphicon-Star</h2>
+  <div>This session is about identifying elements using jQuery methods and selectors.</div>
+  <h3>Rate this session</h3>
+  <div id="rating-container" max-value="5"></div>
+ 
+  <div>
+    <form id="myform">
+      <label for="max-value" >Enter max value:</label>
+      <input type="text" id="max-value" name="field"/>
+      <button type="button" id="update-max-value" >Update max value</button>
+    </form>
+  </div>
+
+  <div>
+    <button type="button" id="save-rating">Save rating</button>
+  </div>
+  <div id="output"></div>
+
+  <script
+        src="http://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+  </script>
+
+  <script>
+
+  //this validation function is called when key is pressed in textbox // you need to choose "#max-value" (id for <input>), not "#update-max-value" (id for <button>) as param in "$("#max-value").keypress(function..."
+  $("#max-value").keypress(function (event) {
+    //if the letter is not digit then display error and don't type anything
+    // in JQuery "event.which" property returns which keyboard key or mouse button was pressed for the event (in pure JavaScript this function is called "event.keyCode" - keyCode property returns the Unicode character code of the key that triggered): 8 - backspace; 0 - null; 48 - 0, 49 - 1, 50 - 2, 51 - 3, 52 - 4, 53 - 5, 54 - 6, 55 - 7, 56 - 8 and 57 - 9 (see List of Unicode characters);
+    if (event.which != 8 && event.which != 0 && (event.which < 48 || event.which > 57)) {
+      //display error message
+      $("#update-max-value").html('<strong style="color:red">Digits Only!</strong>').show().fadeOut(900);
+      $("#update-max-value").after('<div class="error" style="color:red">Please, type digits only.</div>');
+      $("#save-rating").hide();
+      // you have to type "return false" if you want invalid keys coudn't be displayed in chekbox/textbox
+      return false;
+    }
+    else {
+      $("#update-max-value").text("Update max value").show().fadeIn("slow");
+      $(".error").remove();
+      $("#save-rating").text("Save rating").show().fadeIn(900);
+      // you have to type "return true" if you want invalid keys coudn't be displayed in chekbox/textbox
+      return true;
+    };
+  });
+ 
+ 
+ 
+ 
+    // function for changing the number of stars
+    $(function() {
+      $("#rating-container").after($("<br></br>").css("margin-bottom", "0px"));
+      for (var i = 5; i > 0; i--) {
+        $("#rating-container").append("<div class='rating-circle glyphicon glyphicon-star'></div>");
+      };
+      $("#update-max-value").click(function(event){
+        var userValue = $("#max-value").val();
+
+        if(userValue <= 0){
+          $("#update-max-value").html('<strong style="color:red">Invalid value!</strong>').show().fadeOut(900);
+          $("#update-max-value").after('<div class="error2" style="color:red">Please, type a value greater than zero.</div>');
+          $("#save-rating").hide();
+        }
+        else{
+          $("#rating-container").empty();
+          $("#output").text(" ");
+          $("#update-max-value").text("Update max value").show().fadeIn("slow");
+          for (var z = userValue; z > 0; z--) {
+            $("#rating-container").append("<div class='rating-circle glyphicon glyphicon-star'></div>");
+          };
+          $(".error2").remove();
+        };
+      });
+      
+      // function for changing colors of stars
+      $(document).on("mouseenter", ".rating-circle", function(){
+        $(this).addClass("rating-hover");
+        $(this).prevAll().addClass("rating-hover");
+        $(this).nextAll().attr("style", "color: white");
+        $(".rating-hover.rating-chosen").attr("style", "color: yellow");
+      });
+      $(document).on("mouseleave", ".rating-circle", function(){
+        $(".rating-circle").each(function() {
+          $(this).removeClass("rating-hover").removeAttr("style");
+          });
+        });
+      $(document).on("click", ".rating-circle", function(){
+        $(".rating-hover").addClass("rating-chosen").removeAttr("style");
+        $(this).nextAll().removeClass("rating-chosen");
+      });
+
+      // function for saving rating
+      $("#save-rating").click(function() {
+        var rating = {value: $(".rating-chosen:last").index()+1, maxValue: $(".rating-circle:last").index()+1};
+        $("#output").text("You chose " + rating.value + " out of " + rating.maxValue);
+      });
+
+    });
+  </script>
+</body>
+</html>
